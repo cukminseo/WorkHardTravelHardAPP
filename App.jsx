@@ -3,7 +3,8 @@ import { theme } from "./colors";
 import { RefreshControlBase, 
   StatusBar, StyleSheet, Text, View, 
   TouchableHighlight, TouchableOpacity,
-  TouchableWithoutFeedback, Textinput, TextInput
+  TouchableWithoutFeedback, TextInput,
+  ScrollView
 } from "react-native";
 
 export default function App(){
@@ -20,12 +21,12 @@ export default function App(){
       return
     }
     //save to do
-    const newToDos=Object.assign(
-      {},
-      toDos, 
-      {[Date.now()]:{text, work:working}})
+    const newToDos={
+      ...toDos,
+      [Date.now()]:{text, work:working},
+    };
       setToDos(newToDos);
-      
+
     setText("");
 
   }
@@ -43,14 +44,26 @@ export default function App(){
       </View>
 
 
-      <View>
+      <View style={{flex:1}}>
         <TextInput 
         onSubmitEditing={addToDo}
         returnKeyType="done"
         onChangeText={onChangeText}
         value={text}
-        placeholder={working?"add a To Do":"where do you want to go?"} style={styles.input}>
+        placeholder={working?"add a To Do":"where do you want to go?"} 
+        style={styles.input}>
         </TextInput>
+        <ScrollView>{
+
+          Object.keys(toDos).map(key=>
+          <View key={key}>
+            <Text style={styles.toDo} key={key}>
+              <Text style={styles.toDoText}>{toDos[key].text}</Text>
+            </Text>
+          </View>
+          )
+
+          }</ScrollView>
       </View>
     </View>
   );
@@ -77,8 +90,20 @@ const styles = StyleSheet.create({
     backgroundColor:"white",
     paddingVertical:10,
     paddingHorizontal:20,
-    borderRadius:30,
-    marginTop:20,
+    marginVertical:20,
     fontSize:18,
+    borderRadius:20,
+  },
+  toDo:{
+    backgroundColor:theme.toDoBg,
+    borderRadius:30,//not work:P
+    marginBottom:10,
+    paddingVertical:20,
+    paddingHorizontal:20,
+  },
+  toDoText:{
+    color:"white",
+    fontSize:18,
+    fontWeight:"500",
   }
 });
