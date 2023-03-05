@@ -5,7 +5,7 @@ import { RefreshControlBase,
   StatusBar, StyleSheet, Text, View, 
   TouchableHighlight, TouchableOpacity,
   TouchableWithoutFeedback, TextInput,
-  ScrollView
+  ScrollView, Alert
 } from "react-native";
 
 const STORAGE_KEY="@toDos";
@@ -44,6 +44,21 @@ export default function App(){
 
   }
   console.log(toDos);
+  const deleteToDo=async(key)=>{
+    Alert.alert(
+      "Dlete To Do", 
+      "Are you sure?",
+      [
+      {text:"cancel"},
+      {text:"I'm sure",
+      onPress:async()=>{
+        const newToDos={...toDos};
+        delete newToDos[key];
+        setToDos(newToDos);
+        await saveToDos(newToDos);
+      }
+    }]);
+  }
   return(
     <View style={styles.containter}>
       <StatusBar style="auto" />
@@ -71,9 +86,12 @@ export default function App(){
           Object.keys(toDos).map(key=>
             toDos[key].working===working?
           <View key={key}>
-            <Text style={styles.toDo} key={key}>
+            <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[key].text}</Text>
-            </Text>
+              <TouchableOpacity onPress={()=>deleteToDo(key)}>
+                <Text>❌</Text>
+              </TouchableOpacity>
+            </View>
           </View>:null
           )
 
@@ -114,6 +132,10 @@ const styles = StyleSheet.create({
     marginBottom:10,
     paddingVertical:20,
     paddingHorizontal:20,
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+
   },
   toDoText:{
     color:"white",
