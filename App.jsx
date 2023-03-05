@@ -16,9 +16,30 @@ export default function App(){
   const [toDos, setToDos]=useState({});
 
 
-  const travel=()=>setWorking(false);
-  const work=()=>setWorking(true);
+  const travel=()=>{
+    setWorking(false);
+    saveToggle(false);
+  }
+  const work=()=>{
+    setWorking(true);
+    saveToggle(true);
+  };
+
+  const saveToggle=async(toSave)=>{
+    await AsyncStorage.setItem("@toggle",JSON.stringify(toSave));
+    // console.log(toSave); check
+  }
+  const loadToogle=async()=>{
+    const s = await AsyncStorage.getItem("@toggle");
+    JSON.parse(s)? null:setWorking(false);
+  }
+  useEffect(()=>{
+    loadToogle();
+  },[]);
+
+  
   const onChangeText=(payload)=>setText(payload);
+
   const saveToDos= async (toSave)=> {
     await AsyncStorage.setItem(STORAGE_KEY,JSON.stringify(toSave));
   };
@@ -29,6 +50,7 @@ export default function App(){
   useEffect(()=>{
     loadToDos();
   },[]);
+
   const addToDo=async()=>{
     if(text===""){
       return
@@ -43,7 +65,7 @@ export default function App(){
     setText("");
 
   }
-  console.log(toDos);
+  // console.log(toDos);  check
   const deleteToDo=async(key)=>{
     Alert.alert(
       "Dlete To Do", 
