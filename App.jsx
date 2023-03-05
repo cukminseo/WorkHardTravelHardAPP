@@ -7,8 +7,14 @@ import { RefreshControlBase,
   TouchableWithoutFeedback, TextInput,
   ScrollView, Alert
 } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+
+
 
 const STORAGE_KEY="@toDos";
+
+
+
 
 export default function App(){
   const [working, setWorking]=useState(true);
@@ -37,7 +43,7 @@ export default function App(){
     loadToogle();
   },[]);
 
-  
+
   const onChangeText=(payload)=>setText(payload);
 
   const saveToDos= async (toSave)=> {
@@ -45,7 +51,7 @@ export default function App(){
   };
   const loadToDos=async()=>{
     const s = await AsyncStorage.getItem(STORAGE_KEY);
-    setToDos(JSON.parse(s));
+    setToDos(s?JSON.parse(s):{});
   }
   useEffect(()=>{
     loadToDos();
@@ -58,14 +64,14 @@ export default function App(){
     //save to do
     const newToDos={
       ...toDos,
-      [Date.now()]:{text, working},
+      [Date.now()]:{text, working, finished:false},
     };
     setToDos(newToDos);
     await saveToDos(newToDos);
     setText("");
 
   }
-  // console.log(toDos);  check
+  console.log(toDos);  //check
   const deleteToDo=async(key)=>{
     Alert.alert(
       "Dlete To Do", 
@@ -80,6 +86,14 @@ export default function App(){
         await saveToDos(newToDos);
       }
     }]);
+  }
+  const finishToDo=async(key)=>{
+    const newToDos={...toDos};
+    const nowBool=newToDos[key].finished;
+    console.log(nowBool);
+    newToDos[key].finished=!nowBool;
+    setToDos(newToDos);
+    await saveToDos(newToDos);
   }
   return(
     <View style={styles.containter}>
@@ -109,8 +123,22 @@ export default function App(){
             toDos[key].working===working?
           <View key={key}>
             <View style={styles.toDo} key={key}>
-              <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              <TouchableOpacity onPress={()=>deleteToDo(key)}>
+            {toDos[key].finished?
+              <View style={styles.textPlusCheckbox}  key={key}>
+                <Text style={styles.toDoTextFinished}>{toDos[key].text}</Text>
+                <TouchableOpacity onPress={()=>finishToDo(key)}>
+                  <Text>🟦</Text>
+                </TouchableOpacity>
+              </View>
+              :<View style={styles.textPlusCheckbox} key={key}>
+                <Text style={styles.toDoText}>{toDos[key].text}</Text>
+                <TouchableOpacity onPress={()=>finishToDo(key)}>
+                  <Text>🟥</Text>
+                </TouchableOpacity>
+              </View>
+              }
+              
+              <TouchableOpacity style={{flex: 1}} onPress={()=>deleteToDo(key)}>
                 <Text>❌</Text>
               </TouchableOpacity>
             </View>
@@ -150,7 +178,7 @@ const styles = StyleSheet.create({
   },
   toDo:{
     backgroundColor:theme.toDoBg,
-    borderRadius:30,//not work:P
+    borderRadius:30,
     marginBottom:10,
     paddingVertical:20,
     paddingHorizontal:20,
@@ -163,5 +191,22 @@ const styles = StyleSheet.create({
     color:"white",
     fontSize:18,
     fontWeight:"500",
+  },
+  toDoTextFinished:{
+    color:"white",
+    fontSize:18,
+    fontWeight:"500",
+    textDecorationLine:'line-through',
+    color:"grey",
+  },
+  
+  textPlusCheckbox:{
+    flex:10,
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+  },
+  deleteBtn:{
+    flex: 1,
   }
 });
