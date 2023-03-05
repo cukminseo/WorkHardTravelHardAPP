@@ -3,26 +3,33 @@ import { theme } from "./colors";
 import { RefreshControlBase, 
   StatusBar, StyleSheet, Text, View, 
   TouchableHighlight, TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback, Textinput, TextInput
 } from "react-native";
 
 export default function App(){
-  // const [working, setWorking]=useState(true);
-  // const travel=()=>setWorking(flase);
-  // const work=()=>setWorking(true);
+  const [working, setWorking]=useState(true);
+  const [text, setText]=useState("");
+  const travel=()=>setWorking(false);
+  const work=()=>setWorking(true);
+  const onChangeText=(payload)=>setText(event);
   return(
     <View style={styles.containter}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <TouchableOpacity activeOpacity={0}>
-          <Text style={styles.btnText}>Work</Text>
+        <TouchableOpacity onPress={work}>
+          <Text style={{...styles.btnText, color:working?"white":theme.grey}}>Work</Text>
         </TouchableOpacity>
-        <TouchableWithoutFeedback 
-        underlayColor="red"
-        activeOpacity={0.5}
-        onPress={()=>console.log("pressed")}>
-          <Text style={styles.btnText}>Travel</Text>
-        </TouchableWithoutFeedback>
+        <TouchableOpacity onPress={travel}>
+          <Text style={{...styles.btnText, color:!working?"white":theme.grey}}>Travel</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <TextInput 
+        onChangeText={onChangeText}
+        value={text}
+        placeholder={working?"add a To Do":"where do you want to go?"} style={styles.input}>
+
+        </TextInput>
       </View>
     </View>
   );
@@ -41,6 +48,13 @@ const styles = StyleSheet.create({
   btnText:{
     fontSize:44,
     fontWeight:"600",
-    color:"white",
+  },
+  input:{
+    backgroundColor:"white",
+    paddingVertical:10,
+    paddingHorizontal:20,
+    borderRadius:30,
+    marginTop:20,
+    fontSize:18,
   }
 });
