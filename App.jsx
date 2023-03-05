@@ -9,9 +9,27 @@ import { RefreshControlBase,
 export default function App(){
   const [working, setWorking]=useState(true);
   const [text, setText]=useState("");
+  const [toDos, setToDos]=useState({});
+
+
   const travel=()=>setWorking(false);
   const work=()=>setWorking(true);
-  const onChangeText=(payload)=>setText(event);
+  const onChangeText=(payload)=>setText(payload);
+  const addToDo=()=>{
+    if(text===""){
+      return
+    }
+    //save to do
+    const newToDos=Object.assign(
+      {},
+      toDos, 
+      {[Date.now()]:{text, work:working}})
+      setToDos(newToDos);
+      
+    setText("");
+
+  }
+  console.log(toDos);
   return(
     <View style={styles.containter}>
       <StatusBar style="auto" />
@@ -23,17 +41,23 @@ export default function App(){
           <Text style={{...styles.btnText, color:!working?"white":theme.grey}}>Travel</Text>
         </TouchableOpacity>
       </View>
+
+
       <View>
         <TextInput 
+        onSubmitEditing={addToDo}
+        returnKeyType="done"
         onChangeText={onChangeText}
         value={text}
         placeholder={working?"add a To Do":"where do you want to go?"} style={styles.input}>
-
         </TextInput>
       </View>
     </View>
   );
 }
+
+
+
 const styles = StyleSheet.create({
   containter:{
     flex:1,
